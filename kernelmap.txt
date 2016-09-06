@@ -1,0 +1,90 @@
+
+Discarded input sections
+
+ .comment       0x00000000       0x6f kernelc.o
+ .comment       0x00000000       0x6f console.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00010000                . = 0x10000
+
+.text           0x00010000     0x4400
+                0x00010000                stext = .
+ *(.text)
+ .text          0x00010000       0x10 kernelasm.o
+ .text          0x00010010       0x20 kernelc.o
+                0x00010010                kmain
+ .text          0x00010030      0x378 console.o
+                0x00010030                lab3
+                0x0001006c                lab4
+                0x00010094                console_init
+                0x000100fc                setpixel
+                0x00010154                drawrectangle
+                0x00010270                draw_character
+ *(.rodata)
+ *(.rdata)
+ *(.rdata$zzz)
+                0x000103a8                etext = .
+                0x00011000                . = ALIGN (ABSOLUTE (.), 0x1000)
+ *fill*         0x000103a8      0xc58 
+                0x00011000                _sdata = .
+                0x00011000                sdata = .
+ *(.data)
+ .data          0x00011000     0x1000 kernelasm.o
+                0x00012000                stack
+ .data          0x00012000        0x0 kernelc.o
+ .data          0x00012000     0x2400 console.o
+                0x00014400                _edata = .
+                0x00014400                edata = .
+                0x00014400                _sbss = .
+                0x00014400                sbss = .
+ *(COMMON)
+ *(.bss)
+ .bss           0x00014400        0x0 kernelasm.o
+ .bss           0x00014400        0x0 kernelc.o
+ .bss           0x00014400        0x0 console.o
+                0x00014400                _ebss = .
+                0x00014400                ebss = .
+
+.glue_7         0x00014400        0x0
+ .glue_7        0x00014400        0x0 linker stubs
+
+.glue_7t        0x00014400        0x0
+ .glue_7t       0x00014400        0x0 linker stubs
+
+.vfp11_veneer   0x00014400        0x0
+ .vfp11_veneer  0x00014400        0x0 linker stubs
+
+.v4_bx          0x00014400        0x0
+ .v4_bx         0x00014400        0x0 linker stubs
+
+.iplt           0x00014400        0x0
+ .iplt          0x00014400        0x0 kernelasm.o
+
+.igot.plt       0x00014400        0x0
+ .igot.plt      0x00014400        0x0 kernelasm.o
+
+.rel.dyn        0x00014400        0x0
+ .rel.iplt      0x00014400        0x0 kernelasm.o
+
+/DISCARD/
+ *(.eh_frame)
+ *(.comment)
+LOAD kernelasm.o
+LOAD kernelc.o
+LOAD console.o
+OUTPUT(kernel.tmp elf32-littlearm)
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x22 kernelasm.o
+ .ARM.attributes
+                0x00000022       0x32 kernelc.o
+ .ARM.attributes
+                0x00000054       0x32 console.o

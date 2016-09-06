@@ -28,10 +28,6 @@ all:
 	
 	
 clean:
-ifdef SYSTEMROOT
-	-cmd //C del *.o *.exe *.bin *.img *.tmp
-else
 	-/bin/rm *.o *.exe *.bin *.img *.tmp
-endif
 
 	

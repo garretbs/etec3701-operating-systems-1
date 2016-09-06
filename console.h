@@ -21,6 +21,10 @@ void console_init();
 
 void setpixel(int x, int y, unsigned short color);
 
-void drawrectangle(int x, int y, unsigned short color, int length, int width);
+void drawrectangle(int x, int y, int length, int width, unsigned short color);
 
 void lab3();
+
+void lab4();
+
+void draw_character(int x, int y, char c);

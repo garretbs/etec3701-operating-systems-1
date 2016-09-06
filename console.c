@@ -1,7 +1,13 @@
 #include "console.h"
+#include "font.h"
 
 void lab3(){
-	drawrectangle(15, 15, COLOR16(0, 127, 255), 374, 241);
+	drawrectangle(15, 15, 374, 241, COLOR16(0, 127, 255));
+}
+
+void lab4(){
+	//print a Z in the center of the screen
+	draw_character((WIDTH-CHAR_WIDTH)/2, (HEIGHT-CHAR_HEIGHT)/2, 'Z');
 }
 
 void console_init(){
@@ -16,7 +22,7 @@ void setpixel(int x, int y, unsigned short color ){
     framebuffer[ y*WIDTH+x ] = color;
 }
 
-void drawrectangle(int x, int y, unsigned short color, int length, int width){
+void drawrectangle(int x, int y, int length, int width, unsigned short color){
 	for(int i=0; i< length;i++){
 		setpixel(x+i, y, color);
 		setpixel(x+i, y+width, color);
@@ -26,4 +32,19 @@ void drawrectangle(int x, int y, unsigned short color, int length, int width){
 		setpixel(x+length, y+i, color);
 	}
 	setpixel(length+x, width+y, color);
+}
+
+void draw_character(int x, int y, char character){
+	int c = (int) character;
+	int fcolor = COLOR16(255,255,255);
+	int bgcolor = COLOR16(0,0,0);
+	for(int i=0;i<CHAR_HEIGHT;i++){
+		for(int j=0;j<CHAR_WIDTH;j++){
+			if((font_data[c][i] >> j & 1) == 1){
+				setpixel(x+CHAR_WIDTH-j, y+i, fcolor);
+			}else{
+				setpixel(x+CHAR_WIDTH-j, y+i, bgcolor);
+			}
+		}
+	}
 }
