@@ -20,7 +20,9 @@ export SDL_STDIO_REDIRECT
 
 all: 
 	$(AS) kernelasm.s
-	$(LD) -o kernel.tmp kernelasm.o
+	$(CC) kernelc.c
+	$(CC) console.c
+	$(LD) -o kernel.tmp kernelasm.o kernelc.o console.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	$(QEMU) $(QEMUARGS) kernel.bin
 	
