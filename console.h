@@ -10,6 +10,9 @@
 
 #define WIDTH 800
 #define HEIGHT 600
+#define COL_MAX 88
+#define ROW_MAX 66
+#define MAX_ROWS 32
 
 #define framebuffer ((volatile unsigned short*) (((0x07ffffff - WIDTH*HEIGHT*2))&~0xf)) //0x200000; 
 
@@ -27,4 +30,14 @@ void lab3();
 
 void lab4();
 
+void lab5();
+
 void draw_character(int x, int y, char c);
+
+void console_putc(char c);
+
+void print_string(char *string);
+
+void clear_screen();
+
+void variadic_function(char *string, ...);

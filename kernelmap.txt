@@ -13,25 +13,30 @@ Linker script and memory map
 
                 0x00010000                . = 0x10000
 
-.text           0x00010000     0x4400
+.text           0x00010000     0x4408
                 0x00010000                stext = .
  *(.text)
  .text          0x00010000       0x10 kernelasm.o
- .text          0x00010010       0x20 kernelc.o
+ .text          0x00010010       0x1c kernelc.o
                 0x00010010                kmain
- .text          0x00010030      0x378 console.o
-                0x00010030                lab3
-                0x0001006c                lab4
-                0x00010094                console_init
-                0x000100fc                setpixel
-                0x00010154                drawrectangle
-                0x00010270                draw_character
+ .text          0x0001002c      0x694 console.o
+                0x0001002c                lab3
+                0x00010068                lab4
+                0x00010090                lab5
+                0x000100bc                console_init
+                0x00010124                setpixel
+                0x0001017c                drawrectangle
+                0x00010298                draw_character
+                0x000103b8                console_putc
+                0x000105fc                print_string
+                0x00010644                clear_screen
  *(.rodata)
+ .rodata        0x000106c0      0x22b console.o
  *(.rdata)
  *(.rdata$zzz)
-                0x000103a8                etext = .
+                0x000108eb                etext = .
                 0x00011000                . = ALIGN (ABSOLUTE (.), 0x1000)
- *fill*         0x000103a8      0xc58 
+ *fill*         0x000108eb      0x715 
                 0x00011000                _sdata = .
                 0x00011000                sdata = .
  *(.data)
@@ -47,30 +52,30 @@ Linker script and memory map
  *(.bss)
  .bss           0x00014400        0x0 kernelasm.o
  .bss           0x00014400        0x0 kernelc.o
- .bss           0x00014400        0x0 console.o
-                0x00014400                _ebss = .
-                0x00014400                ebss = .
+ .bss           0x00014400        0x8 console.o
+                0x00014408                _ebss = .
+                0x00014408                ebss = .
 
-.glue_7         0x00014400        0x0
- .glue_7        0x00014400        0x0 linker stubs
+.glue_7         0x00014408        0x0
+ .glue_7        0x00014408        0x0 linker stubs
 
-.glue_7t        0x00014400        0x0
- .glue_7t       0x00014400        0x0 linker stubs
+.glue_7t        0x00014408        0x0
+ .glue_7t       0x00014408        0x0 linker stubs
 
-.vfp11_veneer   0x00014400        0x0
- .vfp11_veneer  0x00014400        0x0 linker stubs
+.vfp11_veneer   0x00014408        0x0
+ .vfp11_veneer  0x00014408        0x0 linker stubs
 
-.v4_bx          0x00014400        0x0
- .v4_bx         0x00014400        0x0 linker stubs
+.v4_bx          0x00014408        0x0
+ .v4_bx         0x00014408        0x0 linker stubs
 
-.iplt           0x00014400        0x0
- .iplt          0x00014400        0x0 kernelasm.o
+.iplt           0x00014408        0x0
+ .iplt          0x00014408        0x0 kernelasm.o
 
-.igot.plt       0x00014400        0x0
- .igot.plt      0x00014400        0x0 kernelasm.o
+.igot.plt       0x00014408        0x0
+ .igot.plt      0x00014408        0x0 kernelasm.o
 
-.rel.dyn        0x00014400        0x0
- .rel.iplt      0x00014400        0x0 kernelasm.o
+.rel.dyn        0x00014408        0x0
+ .rel.iplt      0x00014408        0x0 kernelasm.o
 
 /DISCARD/
  *(.eh_frame)
