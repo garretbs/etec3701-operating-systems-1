@@ -32,12 +32,10 @@ void lab4();
 
 void lab5();
 
-void draw_character(int x, int y, char c);
-
-void console_putc(char c);
+void draw_character(int x, int y, char c, char emphasis);
 
 void print_string(char *string);
 
 void clear_screen();
 
-void variadic_function(char *string, ...);
+//void debugout(char x);

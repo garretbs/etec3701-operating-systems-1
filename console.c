@@ -1,6 +1,6 @@
 #include "console.h"
 #include "font.h"
-
+#include "util.h"
 
 
 void lab3(){
@@ -8,7 +8,7 @@ void lab3(){
 }
 
 void lab4(){
-	draw_character((WIDTH-CHAR_WIDTH)/2, (HEIGHT-CHAR_HEIGHT)/2, 'Z');
+	draw_character((WIDTH-CHAR_WIDTH)/2, (HEIGHT-CHAR_HEIGHT)/2, 'Z', 0);
 }
 
 void lab5(){
@@ -54,14 +54,17 @@ void drawrectangle(int x, int y, int length, int width, unsigned short color){
 	setpixel(length+x, width+y, color);
 }
 
-void draw_character(int x, int y, char character){
+void draw_character(int x, int y, char character, char emphasis){
 	int c = (int) character;
 	short fcolor = COLOR16(255,255,255);
 	short bgcolor = COLOR16(0,0,0);
+	short emph_color = COLOR16(255, 0, 0);
+	short text_color = ((short) emphasis > 0) ? emph_color : fcolor;
+	
 	for(int i=0;i<CHAR_HEIGHT;i++){
 		for(int j=0;j<CHAR_WIDTH;j++){
 			if(font_data[c][i] & (1 << (CHAR_WIDTH - j))){
-				setpixel(x+j,y+i, fcolor);
+				setpixel(x+j,y+i, text_color);
 			}else{
 				setpixel(x+j,y+i, bgcolor);
 			}
@@ -72,20 +75,25 @@ void draw_character(int x, int y, char character){
 void console_putc(char c){
 	static int column = 0;
 	static int row = 0;
-	if(c == '\n'){
+	static char emphasis = 0;
+	if(c == '\001'){
+		emphasis = 1;
+	}else if(c == '\002'){
+		emphasis = 0;
+	}else if(c == '\n'){//new line
 		column = 0;
 		row++;
-	}else if(c == '\b'){
+	}else if(c == '\b'){//backspace
 		if(!(row == 0 && column == 0)){
 			column--;
 			if(column < 0){
 				row--;
 				column = COL_MAX;
 			}
-			draw_character(column*CHAR_WIDTH, row*CHAR_HEIGHT, ' ');
+			draw_character(column*CHAR_WIDTH, row*CHAR_HEIGHT, ' ', 0);
 		}
 		
-	}else if (c == '\t'){
+	}else if (c == '\t'){//tab character
 		column >>= 3;
 		column <<= 3;
 		column += 8;
@@ -93,18 +101,25 @@ void console_putc(char c){
 			column = 0;
 			row++;
 		}
-	}else if(c == '\f'){
+	}else if(c == '\f'){//clear screen
 		column = 0;
 		row = 0;
 		clear_screen();
 	}else{
-		draw_character(column*CHAR_WIDTH, row*CHAR_HEIGHT, c);
+		draw_character(column*CHAR_WIDTH, row*CHAR_HEIGHT, c, emphasis);
 		column++;
-		if(column*CHAR_WIDTH >= WIDTH){
+		if(column*CHAR_WIDTH > WIDTH){
 			column = 0;
 			row++;
 		}
 	}
+	if(row >= MAX_ROWS){
+		kmemcpy((void*)framebuffer, (void*)framebuffer+CHAR_HEIGHT*WIDTH*2, WIDTH*HEIGHT*2-WIDTH*CHAR_HEIGHT*2);
+		kmemset((void*)framebuffer + (WIDTH*HEIGHT*2) - (WIDTH*CHAR_HEIGHT*2), 0, WIDTH*CHAR_HEIGHT*2);
+		row--;
+		column = 0;
+	}
+	debugout(c);
 }
 
 void print_string(char *string){
@@ -121,3 +136,4 @@ void clear_screen(){
 		}
 	}
 }
+

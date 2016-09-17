@@ -22,7 +22,9 @@ all:
 	$(AS) kernelasm.s
 	$(CC) kernelc.c
 	$(CC) console.c
-	$(LD) -o kernel.tmp kernelasm.o kernelc.o console.o
+	$(CC) kprintf.c
+	$(CC) util.c
+	$(LD) -o kernel.tmp kernelasm.o kernelc.o console.o util.o kprintf.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	$(QEMU) $(QEMUARGS) kernel.bin
 	

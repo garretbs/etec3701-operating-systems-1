@@ -3,6 +3,8 @@ Discarded input sections
 
  .comment       0x00000000       0x6f kernelc.o
  .comment       0x00000000       0x6f console.o
+ .comment       0x00000000       0x6f util.o
+ .comment       0x00000000       0x6f kprintf.o
 
 Memory Configuration
 
@@ -13,69 +15,88 @@ Linker script and memory map
 
                 0x00010000                . = 0x10000
 
-.text           0x00010000     0x4408
+.text           0x00010000     0x6418
                 0x00010000                stext = .
  *(.text)
  .text          0x00010000       0x10 kernelasm.o
- .text          0x00010010       0x1c kernelc.o
+ .text          0x00010010       0x68 kernelc.o
                 0x00010010                kmain
- .text          0x0001002c      0x694 console.o
-                0x0001002c                lab3
-                0x00010068                lab4
-                0x00010090                lab5
-                0x000100bc                console_init
-                0x00010124                setpixel
-                0x0001017c                drawrectangle
-                0x00010298                draw_character
-                0x000103b8                console_putc
-                0x000105fc                print_string
-                0x00010644                clear_screen
+ .text          0x00010078      0x780 console.o
+                0x00010078                lab3
+                0x000100b4                lab4
+                0x000100e0                lab5
+                0x0001010c                console_init
+                0x00010174                setpixel
+                0x000101cc                drawrectangle
+                0x000102e8                draw_character
+                0x0001043c                console_putc
+                0x00010734                print_string
+                0x0001077c                clear_screen
+ .text          0x000107f8      0x128 util.o
+                0x000107f8                kmemcpy
+                0x00010868                kmemset
+                0x000108c8                debugout
+ .text          0x00010920     0x126c kprintf.o
+                0x00010920                va_arg_
+                0x00010a48                kprintf
+                0x00010a90                ksprintf
  *(.rodata)
- .rodata        0x000106c0      0x22b console.o
+ .rodata        0x00011b8c      0xfde kernelc.o
+ *fill*         0x00012b6a        0x2 
+ .rodata        0x00012b6c      0x22b console.o
+ *fill*         0x00012d97        0x1 
+ .rodata        0x00012d98       0x68 kprintf.o
  *(.rdata)
  *(.rdata$zzz)
-                0x000108eb                etext = .
-                0x00011000                . = ALIGN (ABSOLUTE (.), 0x1000)
- *fill*         0x000108eb      0x715 
-                0x00011000                _sdata = .
-                0x00011000                sdata = .
+                0x00012e00                etext = .
+                0x00013000                . = ALIGN (ABSOLUTE (.), 0x1000)
+ *fill*         0x00012e00      0x200 
+                0x00013000                _sdata = .
+                0x00013000                sdata = .
  *(.data)
- .data          0x00011000     0x1000 kernelasm.o
-                0x00012000                stack
- .data          0x00012000        0x0 kernelc.o
- .data          0x00012000     0x2400 console.o
-                0x00014400                _edata = .
-                0x00014400                edata = .
-                0x00014400                _sbss = .
-                0x00014400                sbss = .
+ .data          0x00013000     0x1000 kernelasm.o
+                0x00014000                stack
+ .data          0x00014000        0x4 kernelc.o
+                0x00014000                decl
+ .data          0x00014004     0x2400 console.o
+ .data          0x00016404        0x8 util.o
+                0x00016404                serialport
+                0x00016408                serialflags
+ .data          0x0001640c        0x0 kprintf.o
+                0x0001640c                _edata = .
+                0x0001640c                edata = .
+                0x0001640c                _sbss = .
+                0x0001640c                sbss = .
  *(COMMON)
  *(.bss)
- .bss           0x00014400        0x0 kernelasm.o
- .bss           0x00014400        0x0 kernelc.o
- .bss           0x00014400        0x8 console.o
-                0x00014408                _ebss = .
-                0x00014408                ebss = .
+ .bss           0x0001640c        0x0 kernelasm.o
+ .bss           0x0001640c        0x0 kernelc.o
+ .bss           0x0001640c        0xc console.o
+ .bss           0x00016418        0x0 util.o
+ .bss           0x00016418        0x0 kprintf.o
+                0x00016418                _ebss = .
+                0x00016418                ebss = .
 
-.glue_7         0x00014408        0x0
- .glue_7        0x00014408        0x0 linker stubs
+.glue_7         0x00016418        0x0
+ .glue_7        0x00016418        0x0 linker stubs
 
-.glue_7t        0x00014408        0x0
- .glue_7t       0x00014408        0x0 linker stubs
+.glue_7t        0x00016418        0x0
+ .glue_7t       0x00016418        0x0 linker stubs
 
-.vfp11_veneer   0x00014408        0x0
- .vfp11_veneer  0x00014408        0x0 linker stubs
+.vfp11_veneer   0x00016418        0x0
+ .vfp11_veneer  0x00016418        0x0 linker stubs
 
-.v4_bx          0x00014408        0x0
- .v4_bx         0x00014408        0x0 linker stubs
+.v4_bx          0x00016418        0x0
+ .v4_bx         0x00016418        0x0 linker stubs
 
-.iplt           0x00014408        0x0
- .iplt          0x00014408        0x0 kernelasm.o
+.iplt           0x00016418        0x0
+ .iplt          0x00016418        0x0 kernelasm.o
 
-.igot.plt       0x00014408        0x0
- .igot.plt      0x00014408        0x0 kernelasm.o
+.igot.plt       0x00016418        0x0
+ .igot.plt      0x00016418        0x0 kernelasm.o
 
-.rel.dyn        0x00014408        0x0
- .rel.iplt      0x00014408        0x0 kernelasm.o
+.rel.dyn        0x00016418        0x0
+ .rel.iplt      0x00016418        0x0 kernelasm.o
 
 /DISCARD/
  *(.eh_frame)
@@ -83,6 +104,8 @@ Linker script and memory map
 LOAD kernelasm.o
 LOAD kernelc.o
 LOAD console.o
+LOAD util.o
+LOAD kprintf.o
 OUTPUT(kernel.tmp elf32-littlearm)
 
 .ARM.attributes
@@ -93,3 +116,7 @@ OUTPUT(kernel.tmp elf32-littlearm)
                 0x00000022       0x32 kernelc.o
  .ARM.attributes
                 0x00000054       0x32 console.o
+ .ARM.attributes
+                0x00000086       0x32 util.o
+ .ARM.attributes
+                0x000000b8       0x32 kprintf.o
