@@ -12,7 +12,7 @@ QEMU=/cygdrive/c/users/garret/documents/os_tools/qemu-windows-2.4.1/qemu-system-
 CC+= -Wall -c -mcpu=arm926ej-s -marm -Werror
 LD+=-Map kernelmap.txt -T linkerscript.txt
 AS+= -c -x assembler-with-cpp -mcpu=arm926ej-s
-QEMUARGS=-machine integratorcp -kernel kernel.bin -serial stdio
+QEMUARGS=-machine integratorcp -kernel kernel.bin -serial stdio -sd sdcard.img
 DISPLAY?=:0
 export DISPLAY
 SDL_STDIO_REDIRECT=no
@@ -24,6 +24,7 @@ all:
 	$(CC) console.c
 	$(CC) kprintf.c
 	$(CC) util.c
+	$(CC) disk.c
 	$(LD) -o kernel.tmp kernelasm.o kernelc.o console.o util.o kprintf.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	$(QEMU) $(QEMUARGS) kernel.bin

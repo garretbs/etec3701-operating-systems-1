@@ -113,7 +113,7 @@ void console_putc(char c){
 			row++;
 		}
 	}
-	if(row >= MAX_ROWS){
+	if(row > MAX_ROWS){
 		kmemcpy((void*)framebuffer, (void*)framebuffer+CHAR_HEIGHT*WIDTH*2, WIDTH*HEIGHT*2-WIDTH*CHAR_HEIGHT*2);
 		kmemset((void*)framebuffer + (WIDTH*HEIGHT*2) - (WIDTH*CHAR_HEIGHT*2), 0, WIDTH*CHAR_HEIGHT*2);
 		row--;
@@ -136,4 +136,3 @@ void clear_screen(){
 		}
 	}
 }
-

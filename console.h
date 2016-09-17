@@ -37,5 +37,3 @@ void draw_character(int x, int y, char c, char emphasis);
 void print_string(char *string);
 
 void clear_screen();
-
-//void debugout(char x);

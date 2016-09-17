@@ -1,5 +1,6 @@
 #include "kprintf.h"
 #include "console.h"
+#include "disk.c"
 
 const char* decl = 
 "IN CONGRESS, July 4, 1776.\n\n"
@@ -62,8 +63,15 @@ const char* decl =
 
 void kmain(){
 	console_init();
-	kprintf("%s",decl);
-    kprintf("%d %d %d %d %d %d",42,43,44,45,46,47);
+	disk_init();
+	
+	char data[512];
+	disk_read_sector(0, data);
+	kprintf(data);
+	disk_read_sector(1, data);
+	kprintf(data);
+	
+	disk_write_sector(2, (void*) decl);
 	
 	//this is just so we know we've gotten here
     asm("ldr r0,=0x1234");
