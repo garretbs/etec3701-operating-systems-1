@@ -65,14 +65,45 @@ void kmain(){
 	console_init();
 	disk_init();
 	
-	char data[512];
-	disk_read_sector(0, data);
-	kprintf(data);
-	disk_read_sector(1, data);
-	kprintf(data);
+	char bgd[512];
+	char sb[1024];
 	
-	disk_write_sector(2, (void*) decl);
+	disk_read_sector(2, sb);
+	disk_read_sector(3, sb+512);
 	
+	struct Superblock* supablock = (struct Superblock*) sb;
+	struct BlockGroupDescriptor* bg = (struct BlockGroupDescriptor*) bgd;	
+	
+	kprintf("Volume label: %s\n", supablock->volname);
+	kprintf("Free blocks: %i\n", supablock->free_block_count);
+	kprintf("Blocks per group: %i\n", supablock->blocks_per_group);
+	
+	int num_groups = 0;
+	while(num_groups * supablock->blocks_per_group < supablock->block_count){
+		num_groups++;
+	}
+	kprintf("Num block groups: %i\n", num_groups);
+	
+	//read block group 0 uniquely since it is offset
+	kprintf("Block group %i at block %i: ", 0, 0);
+	kprintf("Vol label: %s ", supablock->volname);
+	kprintf("Magic: %4x ", supablock->magic);
+	disk_read_sector(8, bgd);
+	kprintf("Free blocks: %i\n", bg->free_blocks);
+	
+	//read subsequent block groups standardly
+	for(int i=1;i<num_groups;++i){
+		//this should work, but windows does not copy superblock properly
+		disk_read_sector(i*8*supablock->blocks_per_group, sb);
+		kprintf("Block group %i at block %i: ", i, supablock->blocks_per_group * i);
+		kprintf("Vol label: %s ", supablock->volname);
+		kprintf("Magic: %4x ", supablock->magic);
+		//this section is fine
+		disk_read_sector(i*8*supablock->blocks_per_group+8, bgd);
+		bg++;
+		kprintf("Free blocks: %i\n", bg->free_blocks);
+	}
+
 	//this is just so we know we've gotten here
     asm("ldr r0,=0x1234");
     while(1){

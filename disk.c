@@ -13,14 +13,14 @@ void disk_init(){
 	
 	*CMD = 2 | (1<<10) | (1<<6) | (1<<7);
 	*CMD = 3 | (1<<10) | (1<<6);
-	unsigned relative_address = *RESPONSE; 
+	unsigned relative_address = *RESPONSE;
 	*ARG = relative_address;
-	*CMD = 7 | (1<<10) | (1<<6);	
+	*CMD = 7 | (1<<10) | (1<<6);
 }
 
 int isBusy(){
     //return busy bit
-    return *STATUS& (1<<24); 
+    return *STATUS & (1<<24); 
 }
 
 void disk_read_sector(unsigned sector, void* datablock){
@@ -47,7 +47,7 @@ void disk_read_sector(unsigned sector, void* datablock){
 void disk_write_sector(unsigned sector, void* datablock){
 	*DATA_LENGTH = 512; 
 	*DATA_TIMER = 100;
-	*DATA_CONTROL = (1<<0) | (9<<4);  
+	*DATA_CONTROL = (1<<0) | (9<<4);     
 	*ARG = 512*sector;     
 	*CLEAR=0x3ff; //clear status flags
 	//do the write
@@ -64,3 +64,5 @@ void disk_write_sector(unsigned sector, void* datablock){
 		p++;
 	}
 }
+
+

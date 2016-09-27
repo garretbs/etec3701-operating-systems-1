@@ -19,42 +19,41 @@ Linker script and memory map
                 0x00010000                stext = .
  *(.text)
  .text          0x00010000       0x10 kernelasm.o
- .text          0x00010010      0x378 kernelc.o
+ .text          0x00010010      0x69c kernelc.o
                 0x00010010                disk_init
                 0x000100e4                isBusy
                 0x0001010c                disk_read_sector
                 0x00010214                disk_write_sector
                 0x00010318                kmain
- .text          0x00010388      0x780 console.o
-                0x00010388                lab3
-                0x000103c4                lab4
-                0x000103f0                lab5
-                0x0001041c                console_init
-                0x00010484                setpixel
-                0x000104dc                drawrectangle
-                0x000105f8                draw_character
-                0x0001074c                console_putc
-                0x00010a44                print_string
-                0x00010a8c                clear_screen
- .text          0x00010b08      0x128 util.o
-                0x00010b08                kmemcpy
-                0x00010b78                kmemset
-                0x00010bd8                debugout
- .text          0x00010c30     0x126c kprintf.o
-                0x00010c30                va_arg_
-                0x00010d58                kprintf
-                0x00010da0                ksprintf
+ .text          0x000106ac      0x780 console.o
+                0x000106ac                lab3
+                0x000106e8                lab4
+                0x00010714                lab5
+                0x00010740                console_init
+                0x000107a8                setpixel
+                0x00010800                drawrectangle
+                0x0001091c                draw_character
+                0x00010a70                console_putc
+                0x00010d68                print_string
+                0x00010db0                clear_screen
+ .text          0x00010e2c      0x128 util.o
+                0x00010e2c                kmemcpy
+                0x00010e9c                kmemset
+                0x00010efc                debugout
+ .text          0x00010f54     0x126c kprintf.o
+                0x00010f54                va_arg_
+                0x0001107c                kprintf
+                0x000110c4                ksprintf
  *(.rodata)
- .rodata        0x00011e9c      0xfc6 kernelc.o
- *fill*         0x00012e62        0x2 
- .rodata        0x00012e64      0x22b console.o
- *fill*         0x0001308f        0x1 
- .rodata        0x00013090       0x68 kprintf.o
+ .rodata        0x000121c0     0x105c kernelc.o
+ .rodata        0x0001321c      0x22b console.o
+ *fill*         0x00013447        0x1 
+ .rodata        0x00013448       0x68 kprintf.o
  *(.rdata)
  *(.rdata$zzz)
-                0x000130f8                etext = .
+                0x000134b0                etext = .
                 0x00014000                . = ALIGN (ABSOLUTE (.), 0x1000)
- *fill*         0x000130f8      0xf08 
+ *fill*         0x000134b0      0xb50 
                 0x00014000                _sdata = .
                 0x00014000                sdata = .
  *(.data)
