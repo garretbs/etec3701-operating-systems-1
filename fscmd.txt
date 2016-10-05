@@ -6,3 +6,7 @@ write article3.txt article3.txt
 write article4.txt article4.txt
 write article5.txt article5.txt
 write article6.txt article6.txt
+mkdir submarine
+cd submarine
+write const.py const.py
+write constitution.txt constitution.txt

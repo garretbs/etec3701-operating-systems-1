@@ -1,4 +1,6 @@
 #include "disk.h"
+#include "util.h"
+#include "kprintf.h"
 
 void disk_init(){
 	*POWER = 3; //00 = off, 11 = on
@@ -65,4 +67,51 @@ void disk_write_sector(unsigned sector, void* datablock){
 	}
 }
 
+void read_block(unsigned blocknum, void* p){
+	for(int i=0;i<8;i++){//8 sectors per block (4kB/512B = 8)
+		disk_read_sector(blocknum*8 + i, p+i*512);
+	}
+}
 
+void print_directories(unsigned inode_num, unsigned depth){
+	if(depth == 0){
+		char sb[1024];
+		disk_read_sector(2, sb);
+		struct Superblock* supablock = (struct Superblock*) sb;	
+		kprintf("Volume label: %s\n", supablock->volname);
+	}
+	
+	char inode_buffer[4096];
+	char dir_buffer[4096];
+	read_block(4, inode_buffer);
+	int ro = 0; //root offset
+	
+	struct Inode* I = (struct Inode*) inode_buffer;
+	struct Inode root_inode;
+	kmemcpy(&root_inode, &(I[inode_num]), sizeof(struct Inode));
+	
+	
+	//read first 4kB of current directory
+	read_block(I[inode_num].direct[0], dir_buffer);	
+	//root_inode.size tells how many bytes are in the root directory
+	
+	struct DirEntry *d = (struct DirEntry*) dir_buffer;
+	while(ro < root_inode.size && d->rec_len > 0){
+		if((depth == 0) || (d->name[0] != '.')){
+			for(int i=0;i<depth;++i){
+				kprintf("\t");
+			}
+			kprintf("Inode: %i %*s\n", d->inode, d->name_len, d->name);
+		}
+		//get file mode, check if not a superdirectory
+		if(((((struct Inode*) I)[d->inode - 1].mode >> 12) == 4) && (d->name[0] != '.')){
+			print_directories(d->inode - 1, depth + 1);
+			//make function recursive, call it to do subdirectories
+		}
+		
+		ro += d->rec_len;
+		d = (struct DirEntry*) (dir_buffer + ro);
+	}
+	if(depth == 0)
+		kprintf("End of root directory.\n");
+}

@@ -9,7 +9,7 @@ forever:
 .section .data
 
 .global stack
-    .rept 1024
+    .rept 4096
     .word 0
     .endr
 stack:
