@@ -27,6 +27,7 @@ all:
 	$(CC) kprintf.c
 	$(CC) util.c
 	$(CC) disk.c
+	$(CC) file.c
 	$(LD) -o kernel.tmp kernelasm.o kernelc.o console.o util.o kprintf.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	$(TRUNCATE) -s 400000000 sdcard.img

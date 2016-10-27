@@ -93,7 +93,7 @@ void print_directories(unsigned inode_num, unsigned depth){
 	
 	//read first 4kB of current directory
 	read_block(I[inode_num].direct[0], dir_buffer);	
-	//root_inode.size tells how many bytes are in the root directory
+	//root_inode.size tells how many bytes are in the current directory
 	
 	struct DirEntry *d = (struct DirEntry*) dir_buffer;
 	while(ro < root_inode.size && d->rec_len > 0){
@@ -103,10 +103,8 @@ void print_directories(unsigned inode_num, unsigned depth){
 			}
 			kprintf("Inode: %i %*s\n", d->inode, d->name_len, d->name);
 		}
-		//get file mode, check if not a superdirectory
 		if(((((struct Inode*) I)[d->inode - 1].mode >> 12) == 4) && (d->name[0] != '.')){
 			print_directories(d->inode - 1, depth + 1);
-			//make function recursive, call it to do subdirectories
 		}
 		
 		ro += d->rec_len;
