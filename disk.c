@@ -1,115 +1,141 @@
-#include "disk.h"
-#include "util.h"
+
 #include "kprintf.h"
 
-void disk_init(){
-	*POWER = 3; //00 = off, 11 = on
-	*CLOCK = 8;
-	*CMD = 8 | (1<<10);
-	
-	do{
-		*CMD = 55 | (1<<10) | (1<<6);
-		*ARG = 0xffffffff;
-		*CMD = 41 | (1<<10) | (1<<6);
-	}while(isBusy());
-	
-	*CMD = 2 | (1<<10) | (1<<6) | (1<<7);
-	*CMD = 3 | (1<<10) | (1<<6);
-	unsigned relative_address = *RESPONSE;
-	*ARG = relative_address;
-	*CMD = 7 | (1<<10) | (1<<6);
-}
+#define MMCP_START ((volatile unsigned*) 0x1c000000 ) 
+#define POWER ( MMCP_START)
+#define CLOCK (MMCP_START+1)
+#define ARG (MMCP_START+2)
+#define CMD (MMCP_START+3)
+#define RESPONSE_CMD (MMCP_START+4)
+#define RESPONSE (MMCP_START+5)
+#define DATA_TIMER (MMCP_START+9)
+#define DATA_LENGTH (MMCP_START+10)
+#define DATA_CONTROL (MMCP_START+11)
+#define DATA_COUNTER (MMCP_START+12)
+#define STATUS (MMCP_START+13)
+#define CLEAR (MMCP_START+14)
+#define INTERRUPT0_MASK (MMCP_START+15)
+#define INTERRUPT1_MASK (MMCP_START+16)
+#define SELECT (MMCP_START+17)
+#define FIFO_COUNT (MMCP_START+18)
+#define DATA_FIFO (MMCP_START+32)
+
+#define BLOCK_SIZE 8
 
 int isBusy(){
     //return busy bit
-    return *STATUS & (1<<24); 
+    return *STATUS & (1<<24) ; 
 }
 
-void disk_read_sector(unsigned sector, void* datablock){
-	*DATA_LENGTH = 512;
-	*DATA_TIMER = 100;
-	*DATA_CONTROL = 1 | (1<<1) | (9<<4);
-	
-	*ARG = 512*sector;
-	*CLEAR=0x3ff;
-	*CMD = 17 | (1<<10) | (1<<6);
-	
-	unsigned* p = datablock;
-	
-	int k;
-	for(k=0;k<128;++k){
-		while( !(*STATUS & (1<<21)) )
-			;	
-		*CLEAR = 0x3ff;
-		unsigned v = *DATA_FIFO;
-		*p++ = v;
-	}
+void disk_init(){
+    
+    //power up the mmc
+    *POWER = 3;
+    
+    //enable clock
+    *CLOCK=8;
+    
+    //reset
+    *CMD = (1<<10);
+
+    //the mmc is now in state idle_state, mode card_identification_mode
+
+    //activate 3.3v parts. QEMU doesn't seem to care, but 
+    //it does have some logic for handling this.
+    *CMD = 8 | (1<<10);
+
+    //we must repeat these until the card is not busy
+    do{
+        //55 = app specific command is next
+        *CMD = 55 | (1<<10) | (1<<6);
+        
+        if( RESPONSE[0] != 0x120 )
+            kprintf("Uh oh.");
+            
+        //set argument
+        *ARG = 0xffffffff; 	//delay. Not relevant, but must be > 0
+        *CMD = 41 | (1<<10) | (1<<6);        //41 = send_op_cond 
+        
+    } while( isBusy() );
+    
+    //we are now in ready state, card identification mode
+    
+    //Request the MMC to send its CardID
+    //move to identification state. This gives a long response.
+    *CMD = 2 | (1<<10) | (1<<6) | (1<<7);
+   
+    //we are now in identification state
+    //we can get to standby state by using cmd3 Send relative address
+    *CMD = 3 | (1<<10) | (1<<6) ;
+
+    unsigned relative_address = RESPONSE[0];
+    
+    //select the card. Docs seem to indicate there
+    //is no response from this one. But Qemu
+    //seems to think there is.
+    *ARG = relative_address;
+    *CMD = 7 | (1<<10) | (1<<6); 
+    
+    //could get interrupts: base+MASK0 = (1<<21) | (1<<18) for rx avail/tx empty
 }
 
-void disk_write_sector(unsigned sector, void* datablock){
-	*DATA_LENGTH = 512; 
-	*DATA_TIMER = 100;
-	*DATA_CONTROL = (1<<0) | (9<<4);     
-	*ARG = 512*sector;     
-	*CLEAR=0x3ff; //clear status flags
-	//do the write
-	*CMD = 24 | (1<<10) | (1<<6);
-	
-	unsigned* p = datablock;  //data to write
-	int k;
-	for(k=0;k<128;++k){
-		//wait until buffer is empty
-		while( (*STATUS & (1<<20)) )
-			;
-		*CLEAR = 0x3ff;
-		*DATA_FIFO = *p;
-		p++;
-	}
+
+void disk_read_sector(unsigned sector, char* datablock){
+
+    //time to read a block
+    *DATA_LENGTH = 512;
+    *DATA_TIMER = 100;	//timeout. What should this be?
+    
+    //bit 0: 1=data transfer enabled
+    //bit 1: 1=read, 0=write
+    //bit 2: 0=block, 1=stream
+    //bit 3: 0=no dma, 1=dma
+    //bits 4-7: block size: Power of 2. Ex: 11=2**11
+    *DATA_CONTROL = (1<<0) | (1<<1) | (9<<4);
+    
+    //looks like qemu emulates SD, not SDHC.
+    //block number. Or is it byte number? Depends on SD vs SDHC.
+    //Must be multiple of 512 if byte number.
+    *ARG = 512*sector;     
+    *CLEAR=0x3ff; //clear status flags
+    *CMD = 17 | (1<<10) | (1<<6);  //read!
+    
+    unsigned* p = (unsigned*) datablock;
+    int k;
+    
+    //get 4 bytes at a time...
+    for(k=0;k<128;++k){
+        //wait for data to be ready
+        while( (*STATUS & (1<<19)) )
+            ;
+        *CLEAR = 0x3ff;
+        unsigned v = DATA_FIFO[0];
+        *p++ = v;
+    }
+
+}
+    
+void disk_write_sector(unsigned sector, const char* datablock){
+    *DATA_LENGTH = 512; //data length
+    *DATA_TIMER = 100;   //timeout. What should this be?
+    *DATA_CONTROL = (1<<0) | (0<<1) | (9<<4);
+    *ARG = 512*sector;     
+    *CLEAR=0x3ff; //clear status flags
+    *CMD = 24 | (1<<10) | (1<<6); 	//do the write
+    unsigned* p = (unsigned*) datablock;
+    int k;
+    for(k=0;k<128;++k){
+        //wait for transmit fifo to be empty
+        while( (*STATUS & (1<<20)) )
+            ;
+        *CLEAR = 0x3ff;
+        DATA_FIFO[0] = *p;
+        p++;
+    }
 }
 
 void read_block(unsigned blocknum, void* p){
-	for(int i=0;i<8;i++){//8 sectors per block (4kB/512B = 8)
-		disk_read_sector(blocknum*8 + i, p+i*512);
+	for(int i=0;i<BLOCK_SIZE;i++){//8 sectors per block (4kB/512B = 8)
+		disk_read_sector(blocknum*BLOCK_SIZE + i, p+i*512);
 	}
-}
-
-void print_directories(unsigned inode_num, unsigned depth){
-	if(depth == 0){
-		char sb[1024];
-		disk_read_sector(2, sb);
-		struct Superblock* supablock = (struct Superblock*) sb;	
-		kprintf("Volume label: %s\n", supablock->volname);
-	}
-	
-	char inode_buffer[4096];
-	char dir_buffer[4096];
-	read_block(4, inode_buffer);
-	int ro = 0; //root offset
-	
-	struct Inode* I = (struct Inode*) inode_buffer;
-	struct Inode root_inode;
-	kmemcpy(&root_inode, &(I[inode_num]), sizeof(struct Inode));
-	
-	
-	//read first 4kB of current directory
-	read_block(I[inode_num].direct[0], dir_buffer);	
-	//root_inode.size tells how many bytes are in the current directory
-	
-	struct DirEntry *d = (struct DirEntry*) dir_buffer;
-	while(ro < root_inode.size && d->rec_len > 0){
-		if((depth == 0) || (d->name[0] != '.')){
-			for(int i=0;i<depth;++i){
-				kprintf("\t");
-			}
-			kprintf("Inode: %i %*s\n", d->inode, d->name_len, d->name);
-		}
-		if(((((struct Inode*) I)[d->inode - 1].mode >> 12) == 4) && (d->name[0] != '.')){
-			print_directories(d->inode - 1, depth + 1);
-		}
-		
-		ro += d->rec_len;
-		d = (struct DirEntry*) (dir_buffer + ro);
-	}
-	if(depth == 0)
-		kprintf("End of root directory.\n");
 }

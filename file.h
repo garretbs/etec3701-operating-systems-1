@@ -1,5 +1,12 @@
 #include "disk.h"
 
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
+
+#define BYTES_PER_INODE 128
+#define BYTES_PER_BLOCK 4096
+
 struct File{
     int in_use;
     struct Inode inode;
