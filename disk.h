@@ -90,9 +90,9 @@ struct DirEntry{
 
 struct BufferEntry{
     char data[4096];
-    int blocknum;
-	unsigned accesstime;
+    unsigned blocknum;
 	unsigned used;
+	unsigned accesstime;
 };
 #define BUFFERSIZE 100
 struct BufferEntry blockbuffer[BUFFERSIZE];
@@ -105,6 +105,6 @@ void disk_read_sector(unsigned sector, char* datablock);
 
 void disk_write_sector(unsigned sector, const char* datablock);
 
-void read_block(unsigned blocknum, void* p);
+void read_block(unsigned blocknum, void* buffer);
 
 void print_directories(unsigned inode_num, unsigned tab_level);

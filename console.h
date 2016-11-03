@@ -16,7 +16,7 @@
 
 #define framebuffer ((volatile unsigned short*) (((0x07ffffff - WIDTH*HEIGHT*2))&~0xf)) //0x200000; 
 
-#define COLOR16(r,g,b) (((b>>3) << 11 )| ((r>>3)) | ((g>>2) << 5))
+#define COLOR16(r,g,b) (((b>>3) << 11 ) | ((r>>3)) | ((g>>2) << 5))
 
 
 
@@ -37,3 +37,5 @@ void draw_character(int x, int y, char c, char emphasis);
 void print_string(char *string);
 
 void clear_screen();
+
+void load_bitmap(const char* filename);

@@ -2,6 +2,8 @@
 #include "errno.h"
 #include "util.h"
 
+#include "kprintf.h"
+
 #define MAX_FILES 16
 static struct File file_table[MAX_FILES];
 
@@ -53,7 +55,41 @@ int file_read(int fd, void* buffer, int count){
 	int bi = kdiv(fp->offset, BYTES_PER_BLOCK); //blocks in file
 	char block_buffer[4096];
 	//inode.direct[bi] is the block number into the file
-	read_block(fp->inode.direct[bi], block_buffer);
+	if(bi < 12){
+		//direct
+		read_block(fp->inode.direct[bi], block_buffer);
+	}
+	else{
+		bi -= 12;
+		unsigned int U[1024];
+		if(bi < 1024){
+			//indirect
+			read_block(fp->inode.indirect, U);
+			read_block(U[bi], block_buffer);
+		}else{
+			bi -= 1024;
+			int oi;
+			int ii;
+			if(bi < 0x100000){ //bi < 1024*1024
+				//double indirect
+				oi = bi >> 10;
+				ii = bi & 1023;
+				read_block(fp->inode.doubleindirect, U);
+				read_block(U[oi], U);
+				read_block(U[ii], block_buffer);
+			}else{
+				bi -= 0x100000; //bi -= 1024*1024
+				//triple indirect
+				int ro = bi >> 20;
+				oi = (bi>>10) & 0x3ff;
+				ii = bi & 0x3ff;
+				read_block(fp->inode.tripleindirect, U);
+				read_block(U[ro], U);
+				read_block(U[oi], U);
+				read_block(U[ii], block_buffer);
+			}
+		}
+	}
 	
 	int bo = kmod(fp->offset, BYTES_PER_BLOCK);//buffer offset
 	
@@ -146,5 +182,5 @@ void load_inode(int fd, short inode_num){
 	read_block(itstart + kdiv(iindex, 32), buffer);
 	
 	int inodestoskip = kmod(iindex, 32);
-	kmemcpy( &(file_table[fd].inode), buffer + inodestoskip*BYTES_PER_INODE, BYTES_PER_INODE);
+	kmemcpy(&(file_table[fd].inode), buffer + inodestoskip*BYTES_PER_INODE, BYTES_PER_INODE);
 }

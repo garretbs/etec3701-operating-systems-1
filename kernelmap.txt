@@ -20,61 +20,60 @@ Linker script and memory map
 
                 0x00010000                . = 0x10000
 
-.text           0x00010000    0x6f184
+.text           0x00010000    0x6f188
                 0x00010000                stext = .
  *(.text)
  .text          0x00010000       0x38 kernelasm.o
- .text          0x00010038     0x112c kernelc.o
+ .text          0x00010038      0x658 kernelc.o
                 0x00010038                isBusy
                 0x00010060                disk_init
                 0x0001015c                disk_read_sector
                 0x00010264                disk_write_sector
                 0x00010368                read_block
-                0x000103dc                file_open
-                0x00010500                file_close
-                0x0001058c                file_read
-                0x00010788                file_write
-                0x000107b4                file_seek
-                0x0001091c                scan_root_for_file
-                0x00010b14                load_inode
-                0x00010d0c                disk_test
-                0x00011144                kmain
- .text          0x00011164      0x780 console.o
-                0x00011164                lab3
-                0x000111a0                lab4
-                0x000111cc                lab5
-                0x000111f8                console_init
-                0x00011260                setpixel
-                0x000112b8                drawrectangle
-                0x000113d4                draw_character
-                0x00011528                console_putc
-                0x00011820                print_string
-                0x00011868                clear_screen
- .text          0x000118e4      0x418 util.o
-                0x000118e4                kmemcpy
-                0x00011954                kmemset
-                0x000119b4                debugout
-                0x00011a0c                kdivmod
-                0x00011aec                kdiv
-                0x00011b24                kmod
-                0x00011b5c                kstrcmp
-                0x00011bf8                fnamecmp
-                0x00011c80                kstrlen
- .text          0x00011cfc     0x126c kprintf.o
-                0x00011cfc                va_arg_
-                0x00011e24                kprintf
-                0x00011e6c                ksprintf
+                0x00010668                kmain
+ .text          0x00010690     0x1610 console.o
+                0x00010690                file_open
+                0x000107b4                file_close
+                0x00010840                file_read
+                0x00010c74                file_write
+                0x00010ca0                file_seek
+                0x00010e08                scan_root_for_file
+                0x00011000                load_inode
+                0x000111f8                lab3
+                0x00011234                lab4
+                0x00011260                lab5
+                0x0001128c                console_init
+                0x000112f4                setpixel
+                0x0001134c                drawrectangle
+                0x00011468                draw_character
+                0x000115bc                console_putc
+                0x000118b4                print_string
+                0x000118fc                clear_screen
+                0x00011978                load_bitmap
+ .text          0x00011ca0      0x418 util.o
+                0x00011ca0                kmemcpy
+                0x00011d10                kmemset
+                0x00011d70                debugout
+                0x00011dc8                kdivmod
+                0x00011ea8                kdiv
+                0x00011ee0                kmod
+                0x00011f18                kstrcmp
+                0x00011fb4                fnamecmp
+                0x0001203c                kstrlen
+ .text          0x000120b8     0x126c kprintf.o
+                0x000120b8                va_arg_
+                0x000121e0                kprintf
+                0x00012228                ksprintf
  *(.rodata)
- .rodata        0x00012f68      0x1df kernelc.o
- *fill*         0x00013147        0x1 
- .rodata        0x00013148      0x22b console.o
- *fill*         0x00013373        0x1 
- .rodata        0x00013374       0x68 kprintf.o
+ .rodata        0x00013324       0x14 kernelc.o
+ .rodata        0x00013338      0x259 console.o
+ *fill*         0x00013591        0x3 
+ .rodata        0x00013594       0x68 kprintf.o
  *(.rdata)
  *(.rdata$zzz)
-                0x000133dc                etext = .
+                0x000135fc                etext = .
                 0x00014000                . = ALIGN (ABSOLUTE (.), 0x1000)
- *fill*         0x000133dc      0xc24 
+ *fill*         0x000135fc      0xa04 
                 0x00014000                _sdata = .
                 0x00014000                sdata = .
  *(.data)
@@ -95,33 +94,33 @@ Linker script and memory map
                 0x0001a408                blockbuffer
  *(.bss)
  .bss           0x0007e8b8        0x0 kernelasm.o
- .bss           0x0007e8b8      0x8c0 kernelc.o
- .bss           0x0007f178        0xc console.o
- .bss           0x0007f184        0x0 util.o
- .bss           0x0007f184        0x0 kprintf.o
-                0x0007f184                _ebss = .
-                0x0007f184                ebss = .
+ .bss           0x0007e8b8        0x4 kernelc.o
+ .bss           0x0007e8bc      0x8cc console.o
+ .bss           0x0007f188        0x0 util.o
+ .bss           0x0007f188        0x0 kprintf.o
+                0x0007f188                _ebss = .
+                0x0007f188                ebss = .
 
-.glue_7         0x0007f184        0x0
- .glue_7        0x0007f184        0x0 linker stubs
+.glue_7         0x0007f188        0x0
+ .glue_7        0x0007f188        0x0 linker stubs
 
-.glue_7t        0x0007f184        0x0
- .glue_7t       0x0007f184        0x0 linker stubs
+.glue_7t        0x0007f188        0x0
+ .glue_7t       0x0007f188        0x0 linker stubs
 
-.vfp11_veneer   0x0007f184        0x0
- .vfp11_veneer  0x0007f184        0x0 linker stubs
+.vfp11_veneer   0x0007f188        0x0
+ .vfp11_veneer  0x0007f188        0x0 linker stubs
 
-.v4_bx          0x0007f184        0x0
- .v4_bx         0x0007f184        0x0 linker stubs
+.v4_bx          0x0007f188        0x0
+ .v4_bx         0x0007f188        0x0 linker stubs
 
-.iplt           0x0007f184        0x0
- .iplt          0x0007f184        0x0 kernelasm.o
+.iplt           0x0007f188        0x0
+ .iplt          0x0007f188        0x0 kernelasm.o
 
-.igot.plt       0x0007f184        0x0
- .igot.plt      0x0007f184        0x0 kernelasm.o
+.igot.plt       0x0007f188        0x0
+ .igot.plt      0x0007f188        0x0 kernelasm.o
 
-.rel.dyn        0x0007f184        0x0
- .rel.iplt      0x0007f184        0x0 kernelasm.o
+.rel.dyn        0x0007f188        0x0
+ .rel.iplt      0x0007f188        0x0 kernelasm.o
 
 /DISCARD/
  *(.eh_frame)

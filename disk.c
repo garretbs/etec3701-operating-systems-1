@@ -1,5 +1,7 @@
 
 #include "kprintf.h"
+#include "util.h"
+#include "disk.h"
 
 #define MMCP_START ((volatile unsigned*) 0x1c000000 ) 
 #define POWER ( MMCP_START)
@@ -20,7 +22,7 @@
 #define FIFO_COUNT (MMCP_START+18)
 #define DATA_FIFO (MMCP_START+32)
 
-#define BLOCK_SIZE 8
+#define BLOCK_SIZE 4096
 
 int isBusy(){
     //return busy bit
@@ -50,7 +52,7 @@ void disk_init(){
         *CMD = 55 | (1<<10) | (1<<6);
         
         if( RESPONSE[0] != 0x120 )
-            kprintf("Uh oh.");
+            kprintf("Uh oh.\n");
             
         //set argument
         *ARG = 0xffffffff; 	//delay. Not relevant, but must be > 0
@@ -134,8 +136,33 @@ void disk_write_sector(unsigned sector, const char* datablock){
     }
 }
 
-void read_block(unsigned blocknum, void* p){
-	for(int i=0;i<BLOCK_SIZE;i++){//8 sectors per block (4kB/512B = 8)
-		disk_read_sector(blocknum*BLOCK_SIZE + i, p+i*512);
+void read_block(unsigned blocknum, void* buffer){
+	static int counter=0;
+    counter++;
+    if(counter > 200){
+        for(int i=0;i<BUFFERSIZE;++i){
+			blockbuffer[i].used = 0;
+		}
 	}
+	int i;
+    for(i=0;i<BUFFERSIZE;++i){
+        if( blockbuffer[i].blocknum == blocknum ){
+            kmemcpy(buffer, blockbuffer[i].data, BLOCK_SIZE);
+            blockbuffer[i].used=1;
+            return;
+        }
+    }
+    int v=-1;
+    for(i=0;i<BUFFERSIZE;i++){
+        if(blockbuffer[i].used == 0)
+            v = i;
+    }
+    if(v < 0) //no victim found
+		v = kmod(BUFFERSIZE, blocknum);
+    for(i=0;i<8;++i){
+		disk_read_sector(blocknum*8 + i, blockbuffer[v].data + i*512);
+	}
+    blockbuffer[v].blocknum = blocknum;
+    blockbuffer[v].accesstime = counter;
+    kmemcpy(buffer, blockbuffer[v].data, BLOCK_SIZE );
 }

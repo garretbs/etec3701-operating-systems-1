@@ -1,13 +1,11 @@
 #include "console.h"
 #include "disk.c"
-#include "file.c"
-#include "disktest.h"
 
 void kmain(){
 	console_init();
 	disk_init();
 	
-	disk_test();
+	load_bitmap("flower1.bmp");
 	
 	//this is just so we know we've gotten here
     asm("ldr r0,=0x1234");

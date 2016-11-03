@@ -1,6 +1,7 @@
 #include "console.h"
 #include "font.h"
 #include "util.h"
+#include "file.c"
 
 
 void lab3(){
@@ -133,6 +134,43 @@ void clear_screen(){
 	for(int i=0;i<HEIGHT;i++){
 		for(int j=0;j<WIDTH;j++){
 			setpixel(j, i, color);
+		}
+	}
+}
+
+void load_bitmap(const char* filename){
+	int fd = file_open(filename, 0);
+    int rv;
+	
+	int headersize;
+	rv = file_seek(fd, 10, SEEK_SET);
+	rv = file_read(fd, &headersize, 4);
+	
+	int img_width; int img_height;
+	rv = file_seek(fd, 18, SEEK_SET);
+	rv = file_read(fd, &img_width, 4);
+	rv = file_seek(fd, 22, SEEK_SET);
+	rv = file_read(fd, &img_height, 4);
+	
+	kprintf("Header size: %i bytes\n", headersize);
+    kprintf("Dimensions: %i x %i\n", img_width, img_height);
+	
+	int x = kdiv(WIDTH-img_width, 2);
+	int y = kdiv(HEIGHT-img_height, 2);
+	
+	const int data_size = 3 * img_width; //3 bytes per pixel, one row's worth of pixels
+	char data[data_size];
+	rv = file_seek(fd, headersize, SEEK_SET);
+	
+	unsigned short color;	
+	for(int j=0;j<img_height;++j){
+		rv = file_read(fd, &data, data_size);
+		while(rv < data_size){ //to ensure we've read the entire row
+			rv += file_read(fd, &data + rv, data_size - rv);
+		}
+		for(int i=0;i<img_width;++i){
+			color = COLOR16(data[2 + i*3], data[1 + i*3], data[i*3]);
+			setpixel(i+x, j+y, color);
 		}
 	}
 }
