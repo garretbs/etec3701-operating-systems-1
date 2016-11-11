@@ -28,7 +28,8 @@ all:
 	$(CC) util.c
 	$(CC) disk.c
 	$(CC) file.c
-	$(LD) -o kernel.tmp kernelasm.o kernelc.o console.o util.o kprintf.o
+	$(CC) interrupt.c
+	$(LD) -o kernel.tmp kernelasm.o kernelc.o console.o util.o kprintf.o interrupt.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	$(TRUNCATE) -s 400000000 sdcard.img
 	$(MKE2FS) sdcard.img
