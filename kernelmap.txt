@@ -25,66 +25,68 @@ Linker script and memory map
                 0x00010000                stext = .
  *(.text)
  .text          0x00010000      0x180 kernelasm.o
- .text          0x00010180      0x64c kernelc.o
+ .text          0x00010180      0x670 kernelc.o
                 0x00010180                isBusy
                 0x000101a8                disk_init
                 0x000102a4                disk_read_sector
                 0x000103ac                disk_write_sector
                 0x000104b0                read_block
                 0x000107b0                kmain
- .text          0x000107cc     0x1610 console.o
-                0x000107cc                file_open
-                0x000108f0                file_close
-                0x0001097c                file_read
-                0x00010db0                file_write
-                0x00010ddc                file_seek
-                0x00010f44                scan_root_for_file
-                0x0001113c                load_inode
-                0x00011334                lab3
-                0x00011370                lab4
-                0x0001139c                lab5
-                0x000113c8                console_init
-                0x00011430                setpixel
-                0x00011488                drawrectangle
-                0x000115a4                draw_character
-                0x000116f8                console_putc
-                0x000119f0                print_string
-                0x00011a38                clear_screen
-                0x00011ab4                load_bitmap
- .text          0x00011ddc      0x418 util.o
-                0x00011ddc                kmemcpy
-                0x00011e4c                kmemset
-                0x00011eac                debugout
-                0x00011f04                kdivmod
-                0x00011fe4                kdiv
-                0x0001201c                kmod
-                0x00012054                kstrcmp
-                0x000120f0                fnamecmp
-                0x00012178                kstrlen
- .text          0x000121f4     0x126c kprintf.o
-                0x000121f4                va_arg_
-                0x0001231c                kprintf
-                0x00012364                ksprintf
- .text          0x00013460       0xe0 interrupt.o
-                0x00013460                handler_reset_c
-                0x0001347c                handler_undefined_c
-                0x00013498                handler_svc_c
-                0x000134b4                handler_prefetchabort_c
-                0x000134d0                handler_dataabort_c
-                0x000134ec                handler_reserved_c
-                0x00013508                handler_irq_c
-                0x00013524                handler_fiq_c
+ .text          0x000107f0     0x16b4 console.o
+                0x000107f0                file_open
+                0x00010914                file_close
+                0x000109a0                file_read
+                0x00010dd4                file_write
+                0x00010e00                file_seek
+                0x00010f68                scan_root_for_file
+                0x00011160                load_inode
+                0x00011358                exec
+                0x000113fc                lab3
+                0x00011438                lab4
+                0x00011464                lab5
+                0x00011490                console_init
+                0x000114f8                setpixel
+                0x00011550                drawrectangle
+                0x0001166c                draw_character
+                0x000117c0                console_putc
+                0x00011ab8                print_string
+                0x00011b00                clear_screen
+                0x00011b7c                load_bitmap
+ .text          0x00011ea4      0x418 util.o
+                0x00011ea4                kmemcpy
+                0x00011f14                kmemset
+                0x00011f74                debugout
+                0x00011fcc                kdivmod
+                0x000120ac                kdiv
+                0x000120e4                kmod
+                0x0001211c                kstrcmp
+                0x000121b8                fnamecmp
+                0x00012240                kstrlen
+ .text          0x000122bc     0x126c kprintf.o
+                0x000122bc                va_arg_
+                0x000123e4                kprintf
+                0x0001242c                ksprintf
+ .text          0x00013528       0xe0 interrupt.o
+                0x00013528                handler_reset_c
+                0x00013544                handler_undefined_c
+                0x00013560                handler_svc_c
+                0x0001357c                handler_prefetchabort_c
+                0x00013598                handler_dataabort_c
+                0x000135b4                handler_reserved_c
+                0x000135d0                handler_irq_c
+                0x000135ec                handler_fiq_c
  *(.rodata)
- .rodata        0x00013540        0x8 kernelc.o
- .rodata        0x00013548      0x259 console.o
- *fill*         0x000137a1        0x3 
- .rodata        0x000137a4       0x68 kprintf.o
- .rodata        0x0001380c       0x51 interrupt.o
+ .rodata        0x00013608       0x27 kernelc.o
+ *fill*         0x0001362f        0x1 
+ .rodata        0x00013630      0x259 console.o
+ *fill*         0x00013889        0x3 
+ .rodata        0x0001388c       0x68 kprintf.o
+ .rodata        0x000138f4       0x51 interrupt.o
  *(.rdata)
  *(.rdata$zzz)
-                0x0001385d                etext = .
+                0x00013945                etext = .
                 0x00014000                . = ALIGN (ABSOLUTE (.), 0x1000)
- *fill*         0x0001385d      0x7a3 
+ *fill*         0x00013945      0x6bb 
                 0x00014000                _sdata = .
                 0x00014000                sdata = .
  *(.data)

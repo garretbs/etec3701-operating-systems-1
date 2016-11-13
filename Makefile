@@ -12,6 +12,7 @@ TRUNCATE=truncate
 MKE2FS=/usr/sbin/mke2fs -b 4096 -F -I 128 -q -t ext2 -r 0 -L moocow -g 32768
 DEBUGFS=/usr/sbin/debugfs -w
 CC+= -Wall -c -mcpu=arm926ej-s -marm -Werror
+LD2:=$(LD) -T linkerscript2.txt
 LD+=-Map kernelmap.txt -T linkerscript.txt
 AS+= -c -x assembler-with-cpp -mcpu=arm926ej-s
 QEMUARGS=-machine integratorcp -kernel kernel.bin -serial stdio -sd sdcard.img
@@ -31,6 +32,10 @@ all:
 	$(CC) interrupt.c
 	$(LD) -o kernel.tmp kernelasm.o kernelc.o console.o util.o kprintf.o interrupt.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
+	$(AS) crt.s
+	$(CC) blink.c
+	$(LD2) -o blink.tmp blink.o
+	$(OBJCOPY) -Obinary blink.tmp blink.bin
 	$(TRUNCATE) -s 400000000 sdcard.img
 	$(MKE2FS) sdcard.img
 	$(DEBUGFS) -f fscmd.txt sdcard.img

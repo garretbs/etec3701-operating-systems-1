@@ -104,7 +104,7 @@ forever:
 .rept 1024
 .word 0
 .endr
-interrupt_stack:
+
 
 
 
@@ -114,3 +114,4 @@ interrupt_stack:
     .endr
 stack:
     
+interrupt_stack:

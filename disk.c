@@ -158,7 +158,7 @@ void read_block(unsigned blocknum, void* buffer){
             v = i;
     }
     if(v < 0) //no victim found
-		v = kdiv(BUFFERSIZE, 2);
+		v = kmod(BUFFERSIZE, blocknum);
     for(i=0;i<8;++i){
 		disk_read_sector(blocknum*8 + i, blockbuffer[v].data + i*512);
 	}

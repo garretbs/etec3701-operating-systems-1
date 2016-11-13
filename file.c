@@ -184,3 +184,35 @@ void load_inode(int fd, short inode_num){
 	int inodestoskip = kmod(iindex, 32);
 	kmemcpy(&(file_table[fd].inode), buffer + inodestoskip*BYTES_PER_INODE, BYTES_PER_INODE);
 }
+
+int exec(const char* filename){
+	int fd = file_open(filename, 0);
+	char *buffer = (char*) 0x400000;//load binary to ram at 0x400000
+	while(1){
+		int rv = file_read(fd, buffer, 1000); //1000 is arbitrary
+		if(rv == 0){
+			break;
+		}else if(rv < 0){
+			return -1;
+		}else{
+			buffer += rv;
+		}
+	}
+	file_close(fd);
+	
+	asm volatile(
+    //get current processor state register
+    "mrs r0,cpsr\n"
+    //mask off lower bits
+    "and r0,#0xffffffe0\n"
+    //set lower bits to 0x10 = user mode
+    "orr r0,#0x10\n"
+    //set current processor state register
+    "msr cpsr,r0\n"
+    //update stack pointer
+    "mov sp,#0x800000\n"
+    //jump to user code
+    "mov pc,#0x400000\n"
+	);
+	return 0;
+}

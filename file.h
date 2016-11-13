@@ -27,3 +27,5 @@ int file_seek(int fd, int offset, int whence);
 short scan_root_for_file(const char* filename);
 
 void load_inode(int fd, short inode_num);
+
+int exec(const char* filename);
