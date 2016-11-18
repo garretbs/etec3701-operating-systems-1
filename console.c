@@ -3,32 +3,17 @@
 #include "util.h"
 #include "file.c"
 
+static unsigned short fcolor = COLOR16(255,255,255);
+static unsigned short bgcolor = COLOR16(0,0,0);
+static unsigned short emph_color = COLOR16(255, 0, 0);
 
-void lab3(){
-	drawrectangle(15, 124, 319, 130, COLOR16(0, 127, 255));
+
+void set_foreground_color(unsigned short color){
+	fcolor = color;
 }
 
-void lab4(){
-	draw_character((WIDTH-CHAR_WIDTH)/2, (HEIGHT-CHAR_HEIGHT)/2, 'Z', 0);
-}
-
-void lab5(){
-	//print_string("Fourscore and\tseven years ago, our\tforefathers brought forth upon this continent");
-	
-	char* bigstring = "When in the course of human. No.\f"
-    "We the people of. Oh crud.\f"
-    "|       |       |       |       |       |       |       |       |       |       |\n"
-    "Fourscore and\tseven years ago, our\tforefathers brought forth upon this continent\n"
-    "a new \tNATION conceived in libertarian\b\b\b\b\by and dedicated to\tthe\tNOTION\tthat\n\n"
-    "all men\b\b\bpeople are created equal.\n\n\n"
-    "Now\n\twe\n\t\tare\n\t\t\tengaged.....................in...............a.........large,"
-    "egregious, massive, overbearing " 
-    "grate\b\b\beat civil strife, \t\t\t\t\t\ttesting whether that "
-    "nation or fooby"
-    "any\b\b\b\b\b\b\b\bany "
-    "nation can so endure.";
-	
-	print_string(bigstring);
+void set_background_color(unsigned short color){
+	bgcolor = color;
 }
 
 void console_init(){
@@ -57,9 +42,7 @@ void drawrectangle(int x, int y, int length, int width, unsigned short color){
 
 void draw_character(int x, int y, char character, char emphasis){
 	int c = (int) character;
-	short fcolor = COLOR16(255,255,255);
-	short bgcolor = COLOR16(0,0,0);
-	short emph_color = COLOR16(255, 0, 0);
+	
 	short text_color = ((short) emphasis > 0) ? emph_color : fcolor;
 	
 	for(int i=0;i<CHAR_HEIGHT;i++){
@@ -116,7 +99,14 @@ void console_putc(char c){
 	}
 	if(row > MAX_ROWS){
 		kmemcpy((void*)framebuffer, (void*)framebuffer+CHAR_HEIGHT*WIDTH*2, WIDTH*HEIGHT*2-WIDTH*CHAR_HEIGHT*2);
-		kmemset((void*)framebuffer + (WIDTH*HEIGHT*2) - (WIDTH*CHAR_HEIGHT*2), 0, WIDTH*CHAR_HEIGHT*2);
+		//kmemset((void*)framebuffer + (WIDTH*HEIGHT*2) - (WIDTH*CHAR_HEIGHT*2), bgcolor, WIDTH*CHAR_HEIGHT*2);
+		for(int i=column*CHAR_WIDTH;i<WIDTH;++i){
+			for(int j=row*CHAR_HEIGHT-CHAR_HEIGHT;j<row*CHAR_HEIGHT;++j){
+				setpixel(i, j, bgcolor);
+			}
+		}
+		
+		
 		row--;
 		column = 0;
 	}
@@ -130,10 +120,9 @@ void print_string(char *string){
 }
 
 void clear_screen(){
-	short color = COLOR16(0, 0, 0);
 	for(int i=0;i<HEIGHT;i++){
 		for(int j=0;j<WIDTH;j++){
-			setpixel(j, i, color);
+			setpixel(j, i, bgcolor);
 		}
 	}
 }

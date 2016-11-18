@@ -30,12 +30,15 @@ all:
 	$(CC) disk.c
 	$(CC) file.c
 	$(CC) interrupt.c
+	$(CC) print.c
 	$(LD) -o kernel.tmp kernelasm.o kernelc.o console.o util.o kprintf.o interrupt.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	$(AS) crt.s
 	$(CC) blink.c
 	$(LD2) -o blink.tmp blink.o
 	$(OBJCOPY) -Obinary blink.tmp blink.bin
+	$(LD2) -o print.tmp print.o
+	$(OBJCOPY) -Obinary print.tmp print.bin
 	$(TRUNCATE) -s 400000000 sdcard.img
 	$(MKE2FS) sdcard.img
 	$(DEBUGFS) -f fscmd.txt sdcard.img

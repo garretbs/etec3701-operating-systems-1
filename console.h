@@ -18,19 +18,15 @@
 
 #define COLOR16(r,g,b) (((b>>3) << 11 ) | ((r>>3)) | ((g>>2) << 5))
 
-
-
 void console_init();
 
 void setpixel(int x, int y, unsigned short color);
 
 void drawrectangle(int x, int y, int length, int width, unsigned short color);
 
-void lab3();
+void set_foreground_color(unsigned short color);
 
-void lab4();
-
-void lab5();
+void set_background_color(unsigned short color);
 
 void draw_character(int x, int y, char c, char emphasis);
 
@@ -39,3 +35,5 @@ void print_string(char *string);
 void clear_screen();
 
 void load_bitmap(const char* filename);
+
+void console_putc(char c);

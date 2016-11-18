@@ -1,16 +1,17 @@
 #include "console.h"
 #include "disk.c"
 #include "file.h"
+#include "syscalls.h"
 
 void kmain(){
 	console_init();
 	disk_init();
+	file_init();
 	
 	int rv;
-	rv = exec("blink.bin");
+	rv = exec("print.bin");
 	if(rv < 0)
-		kprintf("No blink for you.\n");
-	
+		kprintf("No print for you.\n");
 	
     while(1){
     }

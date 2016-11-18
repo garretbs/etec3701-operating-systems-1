@@ -7,6 +7,7 @@ write article4.txt article4.txt
 write article5.txt article5.txt
 write article6.txt article6.txt
 write blink.bin blink.bin
+write print.bin print.bin
 mkdir submarine
 cd submarine
 write const.py const.py

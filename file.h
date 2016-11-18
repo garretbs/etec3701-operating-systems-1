@@ -14,6 +14,8 @@ struct File{
     int flags;   //0=read, 1=write, 2=r/w
 };
 
+void file_init();
+
 int file_open(const char* filename, int open_mode);
 
 int file_close(int descriptor);

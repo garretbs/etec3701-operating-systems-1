@@ -21,121 +21,121 @@ Linker script and memory map
 
                 0x00010000                . = 0x10000
 
-.text           0x00010000    0x70188
+.text           0x00010000    0x7018c
                 0x00010000                stext = .
  *(.text)
- .text          0x00010000      0x180 kernelasm.o
- .text          0x00010180      0x670 kernelc.o
-                0x00010180                isBusy
-                0x000101a8                disk_init
-                0x000102a4                disk_read_sector
-                0x000103ac                disk_write_sector
-                0x000104b0                read_block
-                0x000107b0                kmain
- .text          0x000107f0     0x16b4 console.o
-                0x000107f0                file_open
-                0x00010914                file_close
-                0x000109a0                file_read
-                0x00010dd4                file_write
-                0x00010e00                file_seek
-                0x00010f68                scan_root_for_file
-                0x00011160                load_inode
-                0x00011358                exec
-                0x000113fc                lab3
-                0x00011438                lab4
-                0x00011464                lab5
-                0x00011490                console_init
-                0x000114f8                setpixel
-                0x00011550                drawrectangle
-                0x0001166c                draw_character
-                0x000117c0                console_putc
-                0x00011ab8                print_string
-                0x00011b00                clear_screen
-                0x00011b7c                load_bitmap
- .text          0x00011ea4      0x418 util.o
-                0x00011ea4                kmemcpy
-                0x00011f14                kmemset
-                0x00011f74                debugout
-                0x00011fcc                kdivmod
-                0x000120ac                kdiv
-                0x000120e4                kmod
-                0x0001211c                kstrcmp
-                0x000121b8                fnamecmp
-                0x00012240                kstrlen
- .text          0x000122bc     0x126c kprintf.o
-                0x000122bc                va_arg_
-                0x000123e4                kprintf
-                0x0001242c                ksprintf
- .text          0x00013528       0xe0 interrupt.o
-                0x00013528                handler_reset_c
-                0x00013544                handler_undefined_c
-                0x00013560                handler_svc_c
-                0x0001357c                handler_prefetchabort_c
-                0x00013598                handler_dataabort_c
-                0x000135b4                handler_reserved_c
-                0x000135d0                handler_irq_c
-                0x000135ec                handler_fiq_c
+ .text          0x00010000      0x184 kernelasm.o
+ .text          0x00010184      0x674 kernelc.o
+                0x00010184                isBusy
+                0x000101ac                disk_init
+                0x000102a8                disk_read_sector
+                0x000103b0                disk_write_sector
+                0x000104b4                read_block
+                0x000107b4                kmain
+ .text          0x000107f8     0x1768 console.o
+                0x000107f8                file_init
+                0x00010838                file_open
+                0x0001095c                file_close
+                0x000109e8                file_read
+                0x00010e1c                file_write
+                0x00010e48                file_seek
+                0x00010fb0                scan_root_for_file
+                0x000111a8                load_inode
+                0x000113a0                exec
+                0x00011444                set_foreground_color
+                0x00011478                set_background_color
+                0x000114ac                console_init
+                0x00011514                setpixel
+                0x0001156c                drawrectangle
+                0x00011688                draw_character
+                0x000117ec                console_putc
+                0x00011b74                print_string
+                0x00011bbc                clear_screen
+                0x00011c38                load_bitmap
+ .text          0x00011f60      0x418 util.o
+                0x00011f60                kmemcpy
+                0x00011fd0                kmemset
+                0x00012030                debugout
+                0x00012088                kdivmod
+                0x00012168                kdiv
+                0x000121a0                kmod
+                0x000121d8                kstrcmp
+                0x00012274                fnamecmp
+                0x000122fc                kstrlen
+ .text          0x00012378     0x126c kprintf.o
+                0x00012378                va_arg_
+                0x000124a0                kprintf
+                0x000124e8                ksprintf
+ .text          0x000135e4      0x34c interrupt.o
+                0x000135e4                handler_reset_c
+                0x00013600                handler_undefined_c
+                0x0001361c                handler_svc_c
+                0x000138a4                handler_prefetchabort_c
+                0x000138c0                handler_dataabort_c
+                0x000138dc                handler_reserved_c
+                0x000138f8                handler_irq_c
+                0x00013914                handler_fiq_c
  *(.rodata)
- .rodata        0x00013608       0x27 kernelc.o
- *fill*         0x0001362f        0x1 
- .rodata        0x00013630      0x259 console.o
- *fill*         0x00013889        0x3 
- .rodata        0x0001388c       0x68 kprintf.o
- .rodata        0x000138f4       0x51 interrupt.o
+ .rodata        0x00013930       0x27 kernelc.o
+ *fill*         0x00013957        0x1 
+ .rodata        0x00013958       0x2d console.o
+ *fill*         0x00013985        0x3 
+ .rodata        0x00013988       0x68 kprintf.o
+ .rodata        0x000139f0       0x49 interrupt.o
  *(.rdata)
  *(.rdata$zzz)
-                0x00013945                etext = .
+                0x00013a39                etext = .
                 0x00014000                . = ALIGN (ABSOLUTE (.), 0x1000)
- *fill*         0x00013945      0x6bb 
+ *fill*         0x00013a39      0x5c7 
                 0x00014000                _sdata = .
                 0x00014000                sdata = .
  *(.data)
  .data          0x00014000     0x5000 kernelasm.o
                 0x00019000                stack
  .data          0x00019000        0x0 kernelc.o
- .data          0x00019000     0x2400 console.o
- .data          0x0001b400        0x8 util.o
-                0x0001b400                serialport
-                0x0001b404                serialflags
- .data          0x0001b408        0x0 kprintf.o
- .data          0x0001b408        0x0 interrupt.o
-                0x0001b408                _edata = .
-                0x0001b408                edata = .
-                0x0001b408                _sbss = .
-                0x0001b408                sbss = .
+ .data          0x00019000     0x2404 console.o
+ .data          0x0001b404        0x8 util.o
+                0x0001b404                serialport
+                0x0001b408                serialflags
+ .data          0x0001b40c        0x0 kprintf.o
+ .data          0x0001b40c        0x0 interrupt.o
+                0x0001b40c                _edata = .
+                0x0001b40c                edata = .
+                0x0001b40c                _sbss = .
+                0x0001b40c                sbss = .
  *(COMMON)
- COMMON         0x0001b408    0x644b0 kernelc.o
-                0x0001b408                blockbuffer
+ COMMON         0x0001b40c    0x644b0 kernelc.o
+                0x0001b40c                blockbuffer
  *(.bss)
- .bss           0x0007f8b8        0x0 kernelasm.o
- .bss           0x0007f8b8        0x4 kernelc.o
- .bss           0x0007f8bc      0x8cc console.o
- .bss           0x00080188        0x0 util.o
- .bss           0x00080188        0x0 kprintf.o
- .bss           0x00080188        0x0 interrupt.o
-                0x00080188                _ebss = .
-                0x00080188                ebss = .
+ .bss           0x0007f8bc        0x0 kernelasm.o
+ .bss           0x0007f8bc        0x4 kernelc.o
+ .bss           0x0007f8c0      0x8cc console.o
+ .bss           0x0008018c        0x0 util.o
+ .bss           0x0008018c        0x0 kprintf.o
+ .bss           0x0008018c        0x0 interrupt.o
+                0x0008018c                _ebss = .
+                0x0008018c                ebss = .
 
-.glue_7         0x00080188        0x0
- .glue_7        0x00080188        0x0 linker stubs
+.glue_7         0x0008018c        0x0
+ .glue_7        0x0008018c        0x0 linker stubs
 
-.glue_7t        0x00080188        0x0
- .glue_7t       0x00080188        0x0 linker stubs
+.glue_7t        0x0008018c        0x0
+ .glue_7t       0x0008018c        0x0 linker stubs
 
-.vfp11_veneer   0x00080188        0x0
- .vfp11_veneer  0x00080188        0x0 linker stubs
+.vfp11_veneer   0x0008018c        0x0
+ .vfp11_veneer  0x0008018c        0x0 linker stubs
 
-.v4_bx          0x00080188        0x0
- .v4_bx         0x00080188        0x0 linker stubs
+.v4_bx          0x0008018c        0x0
+ .v4_bx         0x0008018c        0x0 linker stubs
 
-.iplt           0x00080188        0x0
- .iplt          0x00080188        0x0 kernelasm.o
+.iplt           0x0008018c        0x0
+ .iplt          0x0008018c        0x0 kernelasm.o
 
-.igot.plt       0x00080188        0x0
- .igot.plt      0x00080188        0x0 kernelasm.o
+.igot.plt       0x0008018c        0x0
+ .igot.plt      0x0008018c        0x0 kernelasm.o
 
-.rel.dyn        0x00080188        0x0
- .rel.iplt      0x00080188        0x0 kernelasm.o
+.rel.dyn        0x0008018c        0x0
+ .rel.iplt      0x0008018c        0x0 kernelasm.o
 
 /DISCARD/
  *(.eh_frame)

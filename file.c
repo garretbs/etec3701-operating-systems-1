@@ -7,6 +7,12 @@
 #define MAX_FILES 16
 static struct File file_table[MAX_FILES];
 
+void file_init(){
+	file_table[0].in_use = 1;
+	file_table[1].in_use = 1;
+	file_table[2].in_use = 1;
+}
+
 int file_open(const char* filename, int open_mode){
 	int idx = -1;
 	for(int i=0;i<MAX_FILES;i++){
@@ -18,7 +24,9 @@ int file_open(const char* filename, int open_mode){
 	
 	if(idx == -1)
 		return -EMFILE;
+	
 	short inode_num = scan_root_for_file(filename);
+	
 	if(inode_num < 0){
 		return -ENOENT; //File not found
 	}
@@ -144,7 +152,7 @@ int file_seek(int fd, int offs, int whence){
 	return -EINVAL;
 }
 
-short scan_root_for_file(const char* filename){	
+short scan_root_for_file(const char* filename){
 	char inode_buffer[4096];
 	char dir_buffer[4096];
 	read_block(4, inode_buffer);
@@ -153,7 +161,6 @@ short scan_root_for_file(const char* filename){
 	struct Inode* I = (struct Inode*) inode_buffer;
 	struct Inode root_inode;
 	kmemcpy(&root_inode, &(I[1]), sizeof(struct Inode));
-	
 	
 	read_block(I[1].direct[0], dir_buffer);
 	

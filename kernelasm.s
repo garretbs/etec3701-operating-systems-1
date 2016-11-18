@@ -43,7 +43,14 @@ handler_undefined:
  
 .extern handler_svc_c
 handler_svc:
-    interrupt(handler_svc_c)
+    ldr sp,=svc_stack 
+    //don't subtract 4 from lr! svc is special...
+    push {lr} 
+    push {r0-r12} 
+    mov r0,sp
+    bl handler_svc_c
+    pop {r0-r12} 
+    ldm sp!,{pc}^
 	
 .extern handler_prefetchabort_c
 handler_prefetchabort:
@@ -115,3 +122,5 @@ forever:
 stack:
     
 interrupt_stack:
+
+svc_stack:
