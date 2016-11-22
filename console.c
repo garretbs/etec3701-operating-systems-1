@@ -99,14 +99,7 @@ void console_putc(char c){
 	}
 	if(row > MAX_ROWS){
 		kmemcpy((void*)framebuffer, (void*)framebuffer+CHAR_HEIGHT*WIDTH*2, WIDTH*HEIGHT*2-WIDTH*CHAR_HEIGHT*2);
-		//kmemset((void*)framebuffer + (WIDTH*HEIGHT*2) - (WIDTH*CHAR_HEIGHT*2), bgcolor, WIDTH*CHAR_HEIGHT*2);
-		for(int i=column*CHAR_WIDTH;i<WIDTH;++i){
-			for(int j=row*CHAR_HEIGHT-CHAR_HEIGHT;j<row*CHAR_HEIGHT;++j){
-				setpixel(i, j, bgcolor);
-			}
-		}
-		
-		
+		kmemset((void*)framebuffer + (WIDTH*HEIGHT*2) - (WIDTH*CHAR_HEIGHT*2), 0, WIDTH*CHAR_HEIGHT*2);
 		row--;
 		column = 0;
 	}

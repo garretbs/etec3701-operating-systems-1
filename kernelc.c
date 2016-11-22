@@ -1,17 +1,18 @@
 #include "console.h"
 #include "disk.c"
 #include "file.h"
-#include "syscalls.h"
+#include "irq.c"
 
 void kmain(){
 	console_init();
 	disk_init();
 	file_init();
+	irq_init();
 	
 	int rv;
-	rv = exec("print.bin");
+	rv = exec("displaytime.bin");
 	if(rv < 0)
-		kprintf("No print for you.\n");
+		kprintf("Zero Time Dilemma\n");
 	
     while(1){
     }

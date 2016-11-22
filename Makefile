@@ -31,6 +31,7 @@ all:
 	$(CC) file.c
 	$(CC) interrupt.c
 	$(CC) print.c
+	$(CC) displaytime.c
 	$(LD) -o kernel.tmp kernelasm.o kernelc.o console.o util.o kprintf.o interrupt.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	$(AS) crt.s
@@ -39,6 +40,8 @@ all:
 	$(OBJCOPY) -Obinary blink.tmp blink.bin
 	$(LD2) -o print.tmp print.o
 	$(OBJCOPY) -Obinary print.tmp print.bin
+	$(LD2) -o displaytime.tmp displaytime.o
+	$(OBJCOPY) -Obinary displaytime.tmp displaytime.bin
 	$(TRUNCATE) -s 400000000 sdcard.img
 	$(MKE2FS) sdcard.img
 	$(DEBUGFS) -f fscmd.txt sdcard.img

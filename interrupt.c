@@ -3,7 +3,15 @@
 #include "errno.h"
 #include "syscalls.h"
 #include "file.h"
+#include "irq.h"
 
+void halt(){
+    asm volatile(
+        "mov r0,#0\n"
+        "mcr p15,0,r0,c7,c0,4" 
+        : : : "r0"
+    );
+}
 
 void handler_reset_c(){
 	kprintf("reset\n");
@@ -75,6 +83,17 @@ void handler_svc_c(unsigned* ptr){
 			set_background_color(ptr[2]);
 			break;
 		}
+		case SYSCALL_HALT:
+		{
+			halt();
+			break;
+		}
+		case SYSCALL_TIME:
+		{
+			//ptr[1], ptr[2], ptr[3] = hours, minutes, seconds
+			kprintf("%02u:%02u:%02u", ptr[1], ptr[2], ptr[3]);
+			break;
+		}
         default:
 			ptr[0] = -ENOSYS;
         }
@@ -93,7 +112,14 @@ kprintf("reserved\n");
 }
 
 void handler_irq_c(){
-	kprintf("irq\n");
+	//see which interrupts are being asserted
+    //PIC[0] = status
+    //timer #1 = IRQ 6
+    //Note: 0100 0000 == 64
+    if( *IRQ_STATUS & 64 ){
+        TIMER1[3] = 1;    //acknowledge at timer chip
+        //*IRQ_ACKNOWLEDGE = ~64;   //acknowledge at PIC
+    }
 }
 
 void handler_fiq_c(){
