@@ -66,7 +66,13 @@ handler_reserved:
 	
 .extern handler_irq_c
 handler_irq:
-    interrupt(handler_irq_c)
+    ldr sp,=irq_stack 
+    sub lr,lr,#4
+    push {lr} 
+    push {r0-r12} 
+    bl handler_irq_c
+    pop {r0-r12} 
+    ldm sp!,{pc}^
 	
 .extern handler_fiq_c
 handler_fiq:
@@ -119,8 +125,23 @@ forever:
     .rept 4096
     .word 0
     .endr
+
 stack:
+	.rept 4096
+    .word 0
+    .endr
     
 interrupt_stack:
+	.rept 4096
+    .word 0
+    .endr
 
 svc_stack:
+	.rept 4096
+    .word 0
+    .endr
+	
+irq_stack:
+	.rept 4096
+    .word 0
+    .endr

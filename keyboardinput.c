@@ -1,5 +1,6 @@
 
 #include "syscalls.h"
+#include "usprintf.c"
 
 int syscall0(int p0){
     register unsigned r0 asm ("r0");
@@ -43,22 +44,20 @@ int syscall3(int p0, int p1, int p2, int p3){
 
 int main(int argc, char* argv[])
 {
-	// unsigned seconds = 0;
-	// unsigned minutes = 0;
-	// unsigned hours = 0;
-    while(1){
+	char buf[40];
+	char buf2[100];
+	int num=0;
+	int num2;
+	num2 = sprintf(buf2, "User Typing program initialized. Type something.\n");
+	syscall3(SYSCALL_WRITE,1,(unsigned) buf2, num2);
+	while(1){
 		syscall0(SYSCALL_HALT);
-		// syscall0(SYSCALL_CLEAR);
-		// syscall3(SYSCALL_TIME, hours, minutes, seconds++);
-		// if(seconds == 60){
-			// minutes++;
-			// seconds = 0;
-			// if(minutes == 60){
-				// hours++;
-				// minutes = 0;
-			// }
-		// }
+		num = syscall3(SYSCALL_READ,0,(unsigned)buf,40);
+		num2 = sprintf(buf2,"You typed: %.*s\n",num,buf);
+		syscall3(SYSCALL_WRITE,1,(unsigned)buf2,num2);
 	}
     return 0;
 }
+
+
 

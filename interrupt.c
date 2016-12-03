@@ -4,6 +4,11 @@
 #include "syscalls.h"
 #include "file.h"
 #include "irq.h"
+#include "util.h"
+
+static char linebuf[LINEBUF_SIZE];
+static int linebuf_chars = 0;
+static volatile int linebuf_ready = 0;
 
 void halt(){
     asm volatile(
@@ -11,6 +16,52 @@ void halt(){
         "mcr p15,0,r0,c7,c0,4" 
         : : : "r0"
     );
+}
+
+void sti(){
+    asm volatile(
+        "mrs r0,cpsr\n"
+        "and r0,r0,#0xffffff7f\n"
+        "msr cpsr,r0" : : : "r0" 
+    );
+}
+
+void keyboard_interrupt(){
+	unsigned q = KEYBOARD[2];
+	int press = (q&0x80) ? 1 : 0;
+	q &= 0x7f;
+	char c = get_scancode_char(q);
+	
+	if(c == '\b'){
+		if(linebuf_chars > 0 && press){
+			--linebuf_chars;
+			kprintf("\b");
+		}
+	}else if(c == '\n' && press){
+		linebuf_ready = 1;
+		kprintf("\n");
+	}else if((q == 42 || q == 54) || (q == 58 && press)){ //shift keys and capslock
+		shift();
+	}else if(linebuf_chars >= LINEBUF_SIZE){
+		linebuf_ready = 1;
+	}else if(q < 90 && press){
+		linebuf[linebuf_chars] = c;
+		++linebuf_chars;
+		kprintf("%c", c);
+	}
+}
+
+int keyboard_getline(char* buffer,int num){
+    while( !linebuf_ready ){
+		sti();  //enable interrupts
+		halt(); //halt until interrupt
+    }
+    if( num > linebuf_chars )
+        num=linebuf_chars;
+    kmemcpy(buffer,linebuf,num);
+    linebuf_chars=0;
+    linebuf_ready=0;
+    return num;
 }
 
 void handler_reset_c(){
@@ -26,17 +77,23 @@ void handler_svc_c(unsigned* ptr){
 		case SYSCALL_READ:
 		{
 			//int fd = ptr[1];
-			unsigned buf = ptr[2];
-			if( buf < 0x400000 ){
-				ptr[0] = -EFAULT;
-				break;
+			if(ptr[1] == 0){
+				ptr[0] = keyboard_getline((char*) ptr[2], ptr[3]);
+			}else if(ptr[1] < 3){
+				ptr[0] = -ENOSYS;
+			}else{
+				unsigned buf = ptr[2];
+				if( buf < 0x400000 ){
+					ptr[0] = -EFAULT;
+					break;
+				}
+				int count = ptr[3];
+				if( count < 0 ){
+					ptr[0] = -EINVAL;
+					break;
+				}
+				ptr[0] = file_read(ptr[1], (void*) ptr[2], ptr[3]);
 			}
-			int count = ptr[3];
-			if( count < 0 ){
-				ptr[0] = -EINVAL;
-				break;
-			}
-			ptr[0] = file_read(ptr[1], (void*) ptr[2], ptr[3]);
 			break;
 		}
 		case SYSCALL_WRITE:
@@ -88,13 +145,7 @@ void handler_svc_c(unsigned* ptr){
 			halt();
 			break;
 		}
-		case SYSCALL_TIME:
-		{
-			//ptr[1], ptr[2], ptr[3] = hours, minutes, seconds
-			kprintf("%02u:%02u:%02u", ptr[1], ptr[2], ptr[3]);
-			break;
-		}
-        default:
+		default:
 			ptr[0] = -ENOSYS;
         }
 }
@@ -108,7 +159,7 @@ void handler_dataabort_c(){
 }
 
 void handler_reserved_c(){
-kprintf("reserved\n");
+	kprintf("reserved\n");
 }
 
 void handler_irq_c(){
@@ -119,7 +170,10 @@ void handler_irq_c(){
     if( *IRQ_STATUS & 64 ){
         TIMER1[3] = 1;    //acknowledge at timer chip
         //*IRQ_ACKNOWLEDGE = ~64;   //acknowledge at PIC
-    }
+    }else if (*IRQ_STATUS & 8){
+		//KEYBOARD[3] = 1; //acknowledge keyboard
+		keyboard_interrupt();
+	}
 }
 
 void handler_fiq_c(){

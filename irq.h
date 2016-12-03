@@ -7,6 +7,15 @@
 #define TIMER1 ((volatile unsigned*) 0x13000100)
 #define TIMER2 ((volatile unsigned*) 0x13000200)
 
+#define KEYBOARD ((volatile unsigned*) 0x18000000)
+#define LINEBUF_SIZE 89
+
 void irq_init();
 
 void timer_init();
+
+void keyboard_init();
+
+char get_scancode_char(int sc);
+
+void shift();

@@ -10,9 +10,9 @@ void kmain(){
 	irq_init();
 	
 	int rv;
-	rv = exec("displaytime.bin");
+	rv = exec("keyboardinput.bin");
 	if(rv < 0)
-		kprintf("Zero Time Dilemma\n");
+		kprintf("no keys homie\n");
 	
     while(1){
     }

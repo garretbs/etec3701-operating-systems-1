@@ -7,4 +7,3 @@
 #define SYSCALL_CLEAR 5
 #define SYSCALL_SET_COLOR 6
 #define SYSCALL_HALT 7
-#define SYSCALL_TIME 8
